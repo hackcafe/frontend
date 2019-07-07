@@ -50,6 +50,28 @@
       </v-dialog>
 
       <v-dialog
+        v-model="downloadDialog"
+        persistent
+        width="400px">
+        <v-card
+          color="primary"
+          dark>
+          <v-card-text class="title font-weight-light pa-3">Your download is ready!</v-card-text>
+          <v-divider></v-divider>
+          <v-card-text class="subheading font-weight-bold">Download your package <a class="blue--text lighten-1" href="https://www.google.com/" target="_blank">here</a>.</v-card-text>
+
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+              color="blue"
+              @click="downloadDialog = false">
+              OK
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+
+      <v-dialog
         v-model="receiptDialog"
         width="500px">
         <v-list two-line v-if="hacks.filter(hack => hack.enabled).length > 0">
@@ -76,8 +98,8 @@
           </v-card-actions>
         </v-list>
         <v-card v-else>
-          <v-card-title class="headline" primary-title>Alert</v-card-title>
-          <v-card-text>You need to select some hacks first!</v-card-text>
+          <v-card-title class="headline" primary-title>Heads up!</v-card-title>
+          <v-card-text class="title font-weight-light">You need to select some hacks first!</v-card-text>
 
           <v-divider></v-divider>
 
@@ -106,7 +128,12 @@
           :key="category.id"
           :value="category.id">
           <span class="font-weight-light">{{ category.name }}</span>
-          <history-icon>history</history-icon>
+          <v-badge color="indigo">
+            <template v-slot:badge>
+              <span>{{ hacks.filter(hack => hack.category == category.id && hack.enabled).length }}</span>
+            </template>
+            <history-icon>history</history-icon>
+          </v-badge>
         </v-btn>
 
       </v-bottom-nav>
@@ -147,11 +174,11 @@ export default {
     hacks: [],
     loadingDialog: false,
     receiptDialog: false,
+    downloadDialog: false,
   }),
   methods: {
     showReceipt: function(event) {
-      // if (this.selectedHacks.length > 0)
-        this.receiptDialog = true;
+      this.receiptDialog = true;
     },
     sendTicket: function(event) {
       this.loadingDialog = true;
@@ -160,9 +187,9 @@ export default {
       HTTP
         .post('request-package', this.selectedHacks)
         .then(res => {
-          console.log(res.data);
           setTimeout(() => {
             this.loadingDialog = false;
+            this.downloadDialog = true;
           }, 4000);
         });
     },
