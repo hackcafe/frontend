@@ -51,21 +51,22 @@
 
       <v-dialog
         v-model="downloadDialog"
-        persistent
         width="400px">
         <v-card
           color="primary"
           dark>
           <v-card-text class="title font-weight-light pa-3">Your download is ready!</v-card-text>
           <v-divider></v-divider>
-          <v-card-text class="subheading font-weight-bold">Download your package <a class="blue--text lighten-1" href="https://www.google.com/" target="_blank">here</a>.</v-card-text>
+          <v-card-text class="subheading font-weight-bold">Download the corresponding package given the target operating system below.</v-card-text>
 
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn
-              color="blue"
-              @click="downloadDialog = false">
-              OK
+              v-for="ospack in osinfo"
+              :key="ospack.name"
+              :color="ospack.color"
+              @click="startDownload(ospack.name)">
+              {{ ospack.name.toUpperCase() }}
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -147,7 +148,7 @@ import HistoryIcon from 'vue-material-design-icons/History';
 import axios from 'axios';
 
 const HTTP = axios.create({
-  baseURL: `http://536be0e0.ngrok.io/`,
+  baseURL: 'http://8e075c03.ngrok.io/',
   cors: true,
 })
 
@@ -175,6 +176,11 @@ export default {
     loadingDialog: false,
     receiptDialog: false,
     downloadDialog: false,
+    osinfo: [
+      { color: 'blue', name: 'windows' },
+      { color: 'red', name: 'mac' },
+      { color: 'green', name: 'linux' },
+    ]
   }),
   methods: {
     showReceipt: function(event) {
@@ -200,6 +206,9 @@ export default {
         }
       }
       this.$forceUpdate();
+    },
+    startDownload: function(osname) {
+      window.open(`http://8e075c03.ngrok.io/download-${osname}`)
     }
   },
   computed: {
